@@ -28,7 +28,7 @@ lv_anim_t growshrink_anim;
 AnimObjs popnew_objs;
 lv_anim_t popnew_anim;
 
-static void anim_size_cb(void *var, int32_t v)
+static void lv_app_2048_anim_size_cb(void *var, int32_t v)
 {
   AnimObjs *objs = (AnimObjs *)var;
   for (int i = 0; i < objs->anim_count; i++)
@@ -38,7 +38,7 @@ static void anim_size_cb(void *var, int32_t v)
   }
 }
 
-static void anim_x_cb(void *var, int32_t v)
+static void lv_app_2048_anim_x_cb(void *var, int32_t v)
 {
   AnimObjs *objs = (AnimObjs *)var;
   for (int i = 0; i < objs->anim_count; i++)
@@ -48,7 +48,7 @@ static void anim_x_cb(void *var, int32_t v)
   }
 }
 
-static void anim_y_cb(void *var, int32_t v)
+static void lv_app_2048_anim_y_cb(void *var, int32_t v)
 {
   AnimObjs *objs = (AnimObjs *)var;
   for (int i = 0; i < objs->anim_count; i++)
@@ -58,7 +58,7 @@ static void anim_y_cb(void *var, int32_t v)
   }
 }
 
-static void anim_complete_cb(lv_anim_t *anim)
+static void lv_app_2048_anim_complete_cb(lv_anim_t *anim)
 {
   AnimObjs *objs = (AnimObjs *)anim->var;
   lv_obj_t *label;
@@ -73,23 +73,23 @@ static void anim_complete_cb(lv_anim_t *anim)
   }
 }
 
-static void start_anim()
+static void lv_app_2048_start_anim()
 {
   if (move_objs.anim_count > 0)
   {
     lv_anim_init(&move_anim);
     lv_anim_set_var(&move_anim, &move_objs);
-    lv_anim_set_exec_cb(&move_anim, ((move_objs.dir == LV_DIR_LEFT) || (move_objs.dir == LV_DIR_RIGHT)) ? anim_x_cb : anim_y_cb);
+    lv_anim_set_exec_cb(&move_anim, ((move_objs.dir == LV_DIR_LEFT) || (move_objs.dir == LV_DIR_RIGHT)) ? lv_app_2048_anim_x_cb : lv_app_2048_anim_y_cb);
     lv_anim_set_values(&move_anim, 0, ((move_objs.dir == LV_DIR_LEFT) || (move_objs.dir == LV_DIR_TOP)) ? (1 - tile_size_m) : (tile_size_m - 1));
     lv_anim_set_time(&move_anim, 200);
-    lv_anim_set_completed_cb(&move_anim, anim_complete_cb);
+    lv_anim_set_completed_cb(&move_anim, lv_app_2048_anim_complete_cb);
     lv_anim_start(&move_anim);
 
     if (growshrink_objs.anim_count > 0)
     {
       lv_anim_init(&growshrink_anim);
       lv_anim_set_var(&growshrink_anim, &growshrink_objs);
-      lv_anim_set_exec_cb(&growshrink_anim, anim_size_cb);
+      lv_anim_set_exec_cb(&growshrink_anim, lv_app_2048_anim_size_cb);
       lv_anim_set_values(&growshrink_anim, 0, tile_size / 4);
       lv_anim_set_delay(&growshrink_anim, 200);
       lv_anim_set_time(&growshrink_anim, 100);
@@ -102,7 +102,7 @@ static void start_anim()
   {
     lv_anim_init(&popnew_anim);
     lv_anim_set_var(&popnew_anim, &popnew_objs);
-    lv_anim_set_exec_cb(&popnew_anim, anim_size_cb);
+    lv_anim_set_exec_cb(&popnew_anim, lv_app_2048_anim_size_cb);
     lv_anim_set_values(&popnew_anim, 0, tile_size);
     lv_anim_set_delay(&popnew_anim, 200);
     lv_anim_set_time(&popnew_anim, 200);
@@ -111,7 +111,7 @@ static void start_anim()
   }
 }
 
-static void move_obj(int from_x, int from_y, int to_x, int to_y, int v, int steps)
+static void lv_app_2048_move_obj(int from_x, int from_y, int to_x, int to_y, int v, int steps)
 {
   // move
   move_objs.anim[move_objs.anim_count].val = (v * tile_size_m) + tile_offset;
@@ -126,7 +126,7 @@ static void move_obj(int from_x, int from_y, int to_x, int to_y, int v, int step
   tile_val[from_y][from_x] = 0;
 }
 
-static void merge_objs(int from_x, int from_y, int to_x, int to_y, int v, int steps)
+static void lv_app_2048_merge_objs(int from_x, int from_y, int to_x, int to_y, int v, int steps)
 {
   // move
   move_objs.anim[move_objs.anim_count].val = (v * tile_size_m) + tile_offset;
@@ -153,7 +153,7 @@ static void merge_objs(int from_x, int from_y, int to_x, int to_y, int v, int st
   tile_val[from_y][from_x] = 0;
 }
 
-static void pop_obj(int x, int y)
+static void lv_app_2048_pop_obj(int x, int y)
 {
   popnew_objs.anim[popnew_objs.anim_count].obj = tile_obj[y][x];
   popnew_objs.anim[popnew_objs.anim_count].val = 0;

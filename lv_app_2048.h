@@ -1,14 +1,14 @@
-#include "lv_app_2048_rule.h"
+#include "lv_app_2048_check.h"
 #include "lv_app_2048_set_tile.h"
 #include "lv_app_2048_anim.h"
 
-void handle_gesture(lv_event_t *e)
+void lv_app_2048_record_gesture(lv_event_t *e)
 {
   // lv_obj_t *screen = (lv_obj_t *)lv_event_get_current_target(e);
   last_gesture_dir = lv_indev_get_gesture_dir(lv_indev_active());
 }
 
-static void pop_new_tile(int i)
+static void lv_app_2048_new_tile(int i)
 {
   popnew_objs.anim_count = 0;
 
@@ -41,7 +41,7 @@ static void pop_new_tile(int i)
             lv_obj_align(new_label, LV_ALIGN_CENTER, 0, 0);
             lv_app_2048_set_tile(new_tile, new_label, new_value);
 
-            pop_obj(x, y);
+            lv_app_2048_pop_obj(x, y);
 
             if (popnew_objs.anim_count == i)
             {
@@ -75,7 +75,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
     Serial.println("LV_DIR_LEFT");
 #endif
-    if (!check_h_movable(last_gesture_dir))
+    if (!lv_app_2048_check_h_movable(last_gesture_dir))
     {
       last_gesture_dir = LV_DIR_NONE;
       return false;
@@ -97,7 +97,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
               Serial.printf("move: [%d,%d] -> [%d,%d]\n", x, y, last_handle_idx + 1, y);
 #endif
-              move_obj(x, y, last_handle_idx + 1, y, x, x - (last_handle_idx + 1));
+              lv_app_2048_move_obj(x, y, last_handle_idx + 1, y, x, x - (last_handle_idx + 1));
             }
             last_handle_idx++;
           }
@@ -106,7 +106,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
             Serial.printf("merge: [%d,%d], [%d,%d]\n", x, y, last_handle_idx, y);
 #endif
-            merge_objs(x, y, last_handle_idx, y, x, x - last_handle_idx);
+            lv_app_2048_merge_objs(x, y, last_handle_idx, y, x, x - last_handle_idx);
             last_merged_idx = last_handle_idx;
           }
         }
@@ -117,7 +117,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
     Serial.println("LV_DIR_RIGHT");
 #endif
-    if (!check_h_movable(last_gesture_dir))
+    if (!lv_app_2048_check_h_movable(last_gesture_dir))
     {
       last_gesture_dir = LV_DIR_NONE;
       return false;
@@ -139,7 +139,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
               Serial.printf("move: [%d,%d] -> [%d,%d]\n", x, y, last_handle_idx - 1, y);
 #endif
-              move_obj(x, y, last_handle_idx - 1, y, x, (last_handle_idx - 1) - x);
+              lv_app_2048_move_obj(x, y, last_handle_idx - 1, y, x, (last_handle_idx - 1) - x);
             }
             last_handle_idx--;
           }
@@ -148,7 +148,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
             Serial.printf("merge: [%d,%d], [%d,%d]\n", x, y, last_handle_idx, y);
 #endif
-            merge_objs(x, y, last_handle_idx, y, x, last_handle_idx - x);
+            lv_app_2048_merge_objs(x, y, last_handle_idx, y, x, last_handle_idx - x);
             last_merged_idx = last_handle_idx;
           }
         }
@@ -159,7 +159,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
     Serial.println("LV_DIR_TOP");
 #endif
-    if (!check_v_movable(last_gesture_dir))
+    if (!lv_app_2048_check_v_movable(last_gesture_dir))
     {
       last_gesture_dir = LV_DIR_NONE;
       return false;
@@ -181,7 +181,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
               Serial.printf("move: [%d,%d] -> [%d,%d]\n", x, y, x, last_handle_idx + 1);
 #endif
-              move_obj(x, y, x, last_handle_idx + 1, y, y - (last_handle_idx + 1));
+              lv_app_2048_move_obj(x, y, x, last_handle_idx + 1, y, y - (last_handle_idx + 1));
             }
             last_handle_idx++;
           }
@@ -190,7 +190,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
             Serial.printf("merge: [%d,%d], [%d,%d]\n", x, y, x, last_handle_idx);
 #endif
-            merge_objs(x, y, x, last_handle_idx, y, y - last_handle_idx);
+            lv_app_2048_merge_objs(x, y, x, last_handle_idx, y, y - last_handle_idx);
             last_merged_idx = last_handle_idx;
           }
         }
@@ -201,7 +201,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
     Serial.println("LV_DIR_BOTTOM");
 #endif
-    if (!check_v_movable(last_gesture_dir))
+    if (!lv_app_2048_check_v_movable(last_gesture_dir))
     {
       last_gesture_dir = LV_DIR_NONE;
       return false;
@@ -223,7 +223,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
               Serial.printf("move: [%d,%d] -> [%d,%d]\n", x, y, x, last_handle_idx - 1);
 #endif
-              move_obj(x, y, x, last_handle_idx - 1, y, (last_handle_idx - 1) - y);
+              lv_app_2048_move_obj(x, y, x, last_handle_idx - 1, y, (last_handle_idx - 1) - y);
             }
             last_handle_idx--;
           }
@@ -232,7 +232,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
             Serial.printf("merge: [%d,%d], [%d,%d]\n", x, y, x, last_handle_idx);
 #endif
-            merge_objs(x, y, x, last_handle_idx, y, last_handle_idx - y);
+            lv_app_2048_merge_objs(x, y, x, last_handle_idx, y, last_handle_idx - y);
             last_merged_idx = last_handle_idx;
           }
         }
@@ -245,7 +245,7 @@ static bool lv_app_2048_handle_gesture()
   return true;
 }
 
-static void draw_board_value()
+static void lv_app_2048_redraw_board_value()
 {
   for (int y = 0; y < 4; y++)
   {
@@ -361,14 +361,14 @@ static void lv_app_2048(lv_obj_t *scr)
     }
   }
 
-  lv_obj_add_event_cb(board, handle_gesture, LV_EVENT_GESTURE, NULL);
+  lv_obj_add_event_cb(board, lv_app_2048_record_gesture, LV_EVENT_GESTURE, NULL);
   lv_obj_remove_flag(board, LV_OBJ_FLAG_GESTURE_BUBBLE);
 
 #ifdef DEBUG_MODE
-  draw_board_value();
+  lv_app_2048_redraw_board_value();
 #else
-  pop_new_tile(2);
-  start_anim();
+  lv_app_2048_new_tile(2);
+  lv_app_2048_start_anim();
 #endif
 }
 
@@ -376,10 +376,10 @@ static bool lv_app_2048_loop()
 {
   if (lv_app_2048_handle_gesture())
   {
-    pop_new_tile(1);
-    start_anim();
+    lv_app_2048_new_tile(1);
+    lv_app_2048_start_anim();
 #ifdef DEBUG_MODE
-    debug_tile_val();
+    lv_app_2048_check_tile_val();
 #endif
     return true;
   }

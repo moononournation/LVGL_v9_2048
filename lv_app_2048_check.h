@@ -15,7 +15,7 @@ static int tile_val[4][4] = {0};
 static lv_dir_t last_gesture_dir = LV_DIR_NONE;
 static int last_handle_idx;
 
-static bool check_h_movable(lv_dir_t dir)
+static bool lv_app_2048_check_h_movable(lv_dir_t dir)
 {
   for (int y = 0; y < 4; y++)
   {
@@ -44,7 +44,7 @@ static bool check_h_movable(lv_dir_t dir)
   return false;
 }
 
-static bool check_v_movable(lv_dir_t dir)
+static bool lv_app_2048_check_v_movable(lv_dir_t dir)
 {
   for (int x = 0; x < 4; x++)
   {
@@ -73,7 +73,7 @@ static bool check_v_movable(lv_dir_t dir)
   return false;
 }
 
-static void debug_tile_val()
+static void lv_app_2048_check_tile_val()
 {
   for (int y = 0; y < 4; y++)
   {
