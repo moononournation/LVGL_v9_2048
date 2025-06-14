@@ -1,6 +1,8 @@
 static int w, h, margin;
-static int board_size, board_y, board_size_4;
+static int score_tile_w, board_size, board_y, board_size4;
 static int tile_size_m, tile_size_m2, tile_size, tile_offset;
+static lv_obj_t *score_label;
+static lv_obj_t *best_label;
 static lv_obj_t *board;
 static lv_obj_t *tile_obj[4][4];
 #ifdef DEBUG_MODE
@@ -9,11 +11,16 @@ static int tile_val[4][4] = {
     {16, 32, 64, 128},
     {256, 512, 1024, 2048},
     {4096, 8192, 16384, 32768}};
+static int curr_score = 130992;
+static int best_score = 130992;
 #else
 static int tile_val[4][4] = {0};
+static int curr_score = 0;
+static int best_score = 4092;
 #endif
 static lv_dir_t last_gesture_dir = LV_DIR_NONE;
 static int last_handle_idx;
+
 
 static bool lv_app_2048_check_h_movable(lv_dir_t dir)
 {

@@ -136,6 +136,7 @@ static void lv_app_2048_merge_objs(int from_x, int from_y, int to_x, int to_y, i
 
   // merge
   int merge_val = tile_val[from_y][from_x] + tile_val[to_y][to_x];
+  curr_score += merge_val;
   move_objs.tobe_merge[move_objs.tobe_merge_count].val = merge_val;
   move_objs.tobe_merge[move_objs.tobe_merge_count].from = tile_obj[from_y][from_x];
   move_objs.tobe_merge[move_objs.tobe_merge_count].to = tile_obj[to_y][to_x];

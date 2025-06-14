@@ -2,16 +2,14 @@
 #include <lvgl.h>
 
 // Dev Device Pins: <https://github.com/moononournation/Dev_Device_Pins.git>
+#include "PINS_ESP32-S3-Touch-AMOLED-1_8.h"
 // #include "PINS_ESP32-S3-Touch-AMOLED-2_41.h"
-#include "PINS_T4_S3.h"
+// #include "PINS_T4_S3.h"
 
 #ifdef CANVAS_PREFERRED
 #define DIRECT_RENDER_MODE // full frame buffer
 #endif
 
-/*******************************************************************************
- * Please config the touch panel in touch.h
- ******************************************************************************/
 #include "touch.h"
 
 // #define DEBUG_MODE

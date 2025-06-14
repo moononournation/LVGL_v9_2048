@@ -54,6 +54,19 @@ static void lv_app_2048_new_tile(int i)
   }
 }
 
+static void lv_app_2048_display_score()
+{
+  if (curr_score > best_score)
+  {
+    best_score = curr_score;
+  }
+
+  lv_label_set_text_fmt(score_label, "%d", curr_score);
+  lv_obj_set_style_text_font(score_label, lv_app_2048_get_font(score_tile_w, curr_score), LV_PART_MAIN);
+  lv_label_set_text_fmt(best_label, "%d", best_score);
+  lv_obj_set_style_text_font(best_label, lv_app_2048_get_font(score_tile_w, best_score), LV_PART_MAIN);
+}
+
 static bool lv_app_2048_handle_gesture()
 {
   if (last_gesture_dir == LV_DIR_NONE)
@@ -241,6 +254,7 @@ static bool lv_app_2048_handle_gesture()
     break;
   }
 
+  lv_app_2048_display_score();
   last_gesture_dir = LV_DIR_NONE;
   return true;
 }
@@ -273,15 +287,26 @@ static void lv_app_2048(lv_obj_t *scr)
   w = lv_obj_get_width(scr);
   h = lv_obj_get_height(scr);
   margin = w / 32;
+  if (margin < 4)
+  {
+    margin = 4;
+  }
   board_size = w;
   board_y = (w - h) / 2;
-  board_size_4 = board_size / 4;
-  tile_size_m = (board_size - margin) / 4;
+  board_size4 = board_size / 4;
+  tile_size = board_size4 - margin;
+
+  int h6 = h / 6;
+  if (tile_size > h6)
+  {
+    tile_size = h6;
+  }
+  tile_size_m = tile_size + ((board_size4 - tile_size) / 2);
   tile_size_m2 = tile_size_m / 2;
-  tile_size = board_size_4 - margin;
   tile_offset = tile_size_m2 - tile_size_m - tile_size_m;
 
   lv_obj_set_style_bg_color(scr, lv_color_hex(0x000000), LV_PART_MAIN);
+  lv_obj_remove_flag(scr, LV_OBJ_FLAG_SCROLLABLE);
 
   lv_obj_t *title_tile = lv_obj_create(scr);
   lv_obj_remove_flag(title_tile, LV_OBJ_FLAG_SCROLLABLE);
@@ -291,18 +316,16 @@ static void lv_app_2048(lv_obj_t *scr)
   lv_obj_set_pos(title_tile, 0, 0);
 
   lv_obj_t *title_label = lv_label_create(title_tile);
-  lv_label_set_text(title_label, "2048");
-  lv_obj_set_style_text_color(title_label, lv_color_hex(TILE_TEXT2), LV_PART_MAIN);
-  lv_obj_set_style_text_font(title_label, &lv_font_montserrat_32, LV_PART_MAIN);
   lv_obj_align(title_label, LV_ALIGN_CENTER, 0, 0);
+  lv_app_2048_set_tile(title_tile, title_label, 2048);
 
-  int score_tile_width = ((w - tile_size - tile_size_m2) / 2) - margin;
+  score_tile_w = ((w - tile_size - tile_size_m2) / 2) - margin;
   lv_obj_t *score_tile = lv_obj_create(scr);
   lv_obj_remove_flag(score_tile, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_set_style_bg_color(score_tile, lv_color_hex(BOARD_BG), LV_PART_MAIN);
   lv_obj_set_style_border_width(score_tile, 0, LV_PART_MAIN);
-  lv_obj_set_size(score_tile, score_tile_width, tile_size);
-  lv_obj_set_pos(score_tile, w - score_tile_width - margin - score_tile_width, 0);
+  lv_obj_set_size(score_tile, score_tile_w, tile_size);
+  lv_obj_set_pos(score_tile, w - score_tile_w - margin - score_tile_w, 0);
 
   lv_obj_t *score_title_label = lv_label_create(score_tile);
   lv_label_set_text(score_title_label, "SCORE");
@@ -310,18 +333,16 @@ static void lv_app_2048(lv_obj_t *scr)
   lv_obj_set_style_text_font(score_title_label, &lv_font_montserrat_18, LV_PART_MAIN);
   lv_obj_align(score_title_label, LV_ALIGN_CENTER, 0, -24);
 
-  lv_obj_t *score_label = lv_label_create(score_tile);
-  lv_label_set_text(score_label, "130992");
+  score_label = lv_label_create(score_tile);
   lv_obj_set_style_text_color(score_label, lv_color_hex(TILE_TEXT2), LV_PART_MAIN);
-  lv_obj_set_style_text_font(score_label, &lv_font_montserrat_32, LV_PART_MAIN);
-  lv_obj_align(score_label, LV_ALIGN_CENTER, 0, 16);
+  lv_obj_align(score_label, LV_ALIGN_CENTER, 0, tile_size / 6);
 
   lv_obj_t *best_tile = lv_obj_create(scr);
   lv_obj_remove_flag(best_tile, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_set_style_bg_color(best_tile, lv_color_hex(BOARD_BG), LV_PART_MAIN);
   lv_obj_set_style_border_width(best_tile, 0, LV_PART_MAIN);
-  lv_obj_set_size(best_tile, score_tile_width, tile_size);
-  lv_obj_set_pos(best_tile, w - score_tile_width, 0);
+  lv_obj_set_size(best_tile, score_tile_w, tile_size);
+  lv_obj_set_pos(best_tile, w - score_tile_w, 0);
 
   lv_obj_t *best_title_label = lv_label_create(best_tile);
   lv_label_set_text(best_title_label, "BEST");
@@ -329,11 +350,11 @@ static void lv_app_2048(lv_obj_t *scr)
   lv_obj_set_style_text_font(best_title_label, &lv_font_montserrat_18, LV_PART_MAIN);
   lv_obj_align(best_title_label, LV_ALIGN_CENTER, 0, -24);
 
-  lv_obj_t *best_label = lv_label_create(best_tile);
-  lv_label_set_text(best_label, "130992");
+  best_label = lv_label_create(best_tile);
   lv_obj_set_style_text_color(best_label, lv_color_hex(TILE_TEXT2), LV_PART_MAIN);
-  lv_obj_set_style_text_font(best_label, &lv_font_montserrat_32, LV_PART_MAIN);
-  lv_obj_align(best_label, LV_ALIGN_CENTER, 0, 16);
+  lv_obj_align(best_label, LV_ALIGN_CENTER, 0, tile_size / 6);
+
+  lv_app_2048_display_score();
 
   lv_obj_t *remark_label = lv_label_create(scr);
   lv_label_set_text(remark_label, "Join the numbers and get to the 2048 tile!");
