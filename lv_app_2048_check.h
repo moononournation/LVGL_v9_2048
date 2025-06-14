@@ -1,3 +1,8 @@
+#define RIGHT_MOVABLE_BIT 0b0001
+#define BOTTOM_MOVABLE_BIT 0b0010
+#define TOP_MOVABLE_BIT 0b0100
+#define LEFT_MOVABLE_BIT 0b1000
+
 static int w, h, margin;
 static int score_tile_w, board_size, board_y, board_size4;
 static int tile_size_m, tile_size_m2, tile_size, tile_offset;
@@ -19,65 +24,50 @@ static int curr_score = 0;
 static int best_score = 4092;
 #endif
 static lv_dir_t last_gesture_dir = LV_DIR_NONE;
+static byte movable;
 static int last_handle_idx;
 
-
-static bool lv_app_2048_check_h_movable(lv_dir_t dir)
+static void lv_app_2048_check_movable()
 {
+  movable = 0;
+  // loop rows
   for (int y = 0; y < 4; y++)
   {
-    if (dir == LV_DIR_LEFT)
+    if (((tile_val[y][0] == 0) && (tile_val[y][1] > 0)) || ((tile_val[y][1] == 0) && (tile_val[y][2] > 0)) || ((tile_val[y][2] == 0) && (tile_val[y][3] > 0)))
     {
-      if (((tile_val[y][0] == 0) && (tile_val[y][1] > 0)) || ((tile_val[y][1] == 0) && (tile_val[y][2] > 0)) || ((tile_val[y][2] == 0) && (tile_val[y][3] > 0)))
-      {
-        return true;
-      }
+      movable |= LEFT_MOVABLE_BIT;
     }
-    else if (dir == LV_DIR_RIGHT)
+    if (((tile_val[y][3] == 0) && (tile_val[y][2] > 0)) || ((tile_val[y][2] == 0) && (tile_val[y][1] > 0)) || ((tile_val[y][1] == 0) && (tile_val[y][0] > 0)))
     {
-      if (((tile_val[y][3] == 0) && (tile_val[y][2] > 0)) || ((tile_val[y][2] == 0) && (tile_val[y][1] > 0)) || ((tile_val[y][1] == 0) && (tile_val[y][0] > 0)))
-      {
-        return true;
-      }
+      movable |= RIGHT_MOVABLE_BIT;
     }
     for (int x = 0; x < 3; x++)
     {
       if ((tile_val[y][x] > 0) && (tile_val[y][x] == tile_val[y][x + 1]))
       {
-        return true;
+        movable |= LEFT_MOVABLE_BIT | RIGHT_MOVABLE_BIT;
       }
     }
   }
-  return false;
-}
-
-static bool lv_app_2048_check_v_movable(lv_dir_t dir)
-{
+  // loop columns
   for (int x = 0; x < 4; x++)
   {
-    if (dir == LV_DIR_TOP)
+    if (((tile_val[0][x] == 0) && (tile_val[1][x] > 0)) || ((tile_val[1][x] == 0) && (tile_val[2][x] > 0)) || ((tile_val[2][x] == 0) && (tile_val[3][x] > 0)))
     {
-      if (((tile_val[0][x] == 0) && (tile_val[1][x] > 0)) || ((tile_val[1][x] == 0) && (tile_val[2][x] > 0)) || ((tile_val[2][x] == 0) && (tile_val[3][x] > 0)))
-      {
-        return true;
-      }
+      movable |= TOP_MOVABLE_BIT;
     }
-    else if (dir == LV_DIR_BOTTOM)
+    if (((tile_val[3][x] == 0) && (tile_val[2][x] > 0)) || ((tile_val[2][x] == 0) && (tile_val[1][x] > 0)) || ((tile_val[1][x] == 0) && (tile_val[0][x] > 0)))
     {
-      if (((tile_val[3][x] == 0) && (tile_val[2][x] > 0)) || ((tile_val[2][x] == 0) && (tile_val[1][x] > 0)) || ((tile_val[1][x] == 0) && (tile_val[0][x] > 0)))
-      {
-        return true;
-      }
+      movable |= BOTTOM_MOVABLE_BIT;
     }
     for (int y = 0; y < 3; y++)
     {
       if ((tile_val[y][x] > 0) && (tile_val[y][x] == tile_val[y + 1][x]))
       {
-        return true;
+        movable |= TOP_MOVABLE_BIT | BOTTOM_MOVABLE_BIT;
       }
     }
   }
-  return false;
 }
 
 static void lv_app_2048_check_tile_val()

@@ -88,7 +88,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
     Serial.println("LV_DIR_LEFT");
 #endif
-    if (!lv_app_2048_check_h_movable(last_gesture_dir))
+    if ((movable & LEFT_MOVABLE_BIT) == 0)
     {
       last_gesture_dir = LV_DIR_NONE;
       return false;
@@ -130,7 +130,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
     Serial.println("LV_DIR_RIGHT");
 #endif
-    if (!lv_app_2048_check_h_movable(last_gesture_dir))
+    if ((movable & RIGHT_MOVABLE_BIT) == 0)
     {
       last_gesture_dir = LV_DIR_NONE;
       return false;
@@ -172,7 +172,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
     Serial.println("LV_DIR_TOP");
 #endif
-    if (!lv_app_2048_check_v_movable(last_gesture_dir))
+    if ((movable & TOP_MOVABLE_BIT) == 0)
     {
       last_gesture_dir = LV_DIR_NONE;
       return false;
@@ -214,7 +214,7 @@ static bool lv_app_2048_handle_gesture()
 #ifdef DEBUG_MODE
     Serial.println("LV_DIR_BOTTOM");
 #endif
-    if (!lv_app_2048_check_v_movable(last_gesture_dir))
+    if ((movable & BOTTOM_MOVABLE_BIT) == 0)
     {
       last_gesture_dir = LV_DIR_NONE;
       return false;
@@ -395,6 +395,7 @@ static void lv_app_2048(lv_obj_t *scr)
 
 static bool lv_app_2048_loop()
 {
+  lv_app_2048_check_movable();
   if (lv_app_2048_handle_gesture())
   {
     lv_app_2048_new_tile(1);
