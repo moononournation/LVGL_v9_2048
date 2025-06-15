@@ -6,6 +6,7 @@
 static int w, h, margin;
 static int score_tile_w, board_size, board_y, board_size4;
 static int tile_size_m, tile_size_m2, tile_size, tile_offset;
+static lv_obj_t *score_tile;
 static lv_obj_t *score_label;
 static lv_obj_t *best_label;
 static lv_obj_t *board;
@@ -23,9 +24,11 @@ static int tile_val[4][4] = {0};
 static int curr_score = 0;
 static int best_score = 4092;
 #endif
+static bool isPlaying;
 static lv_dir_t last_gesture_dir = LV_DIR_NONE;
 static byte movable;
 static int last_handle_idx;
+static bool score_tile_clicked;
 
 static void lv_app_2048_check_movable()
 {

@@ -8,6 +8,14 @@ void lv_app_2048_record_gesture(lv_event_t *e)
   last_gesture_dir = lv_indev_get_gesture_dir(lv_indev_active());
 }
 
+void lv_app_2048_record_score_tile_click(lv_event_t *e)
+{
+  if (!isPlaying)
+  {
+    score_tile_clicked = true;
+  }
+}
+
 static void lv_app_2048_new_tile(int i)
 {
   popnew_objs.anim_count = 0;
@@ -75,11 +83,9 @@ static bool lv_app_2048_handle_gesture()
   }
 
   // init value
+  lv_app_2048_anim_reset();
   move_objs.dir = last_gesture_dir;
-  move_objs.anim_count = 0;
-  move_objs.tobe_merge_count = 0;
-  growshrink_objs.anim_count = 0;
-  popnew_objs.anim_count = 0;
+
   int last_merged_idx;
   lv_obj_t *tmp_tile[4];
   switch (last_gesture_dir)
@@ -267,17 +273,28 @@ static void lv_app_2048_redraw_board_value()
     {
       int value = tile_val[y][x];
 
-      lv_obj_t *cur_tile = lv_obj_create(board);
-      tile_obj[y][x] = cur_tile;
-      lv_obj_remove_flag(cur_tile, LV_OBJ_FLAG_SCROLLABLE);
-      lv_obj_set_style_border_width(cur_tile, 0, LV_PART_MAIN);
-      lv_obj_set_size(cur_tile, tile_size, tile_size);
-      lv_obj_align(cur_tile, LV_ALIGN_CENTER, (x * tile_size_m) + tile_offset, (y * tile_size_m) + tile_offset);
+      if (value)
+      {
+        lv_obj_t *cur_tile = lv_obj_create(board);
+        tile_obj[y][x] = cur_tile;
+        lv_obj_remove_flag(cur_tile, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_set_style_border_width(cur_tile, 0, LV_PART_MAIN);
+        lv_obj_set_size(cur_tile, tile_size, tile_size);
+        lv_obj_align(cur_tile, LV_ALIGN_CENTER, (x * tile_size_m) + tile_offset, (y * tile_size_m) + tile_offset);
 
-      lv_obj_t *tile_label = lv_label_create(cur_tile);
-      lv_obj_align(tile_label, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_t *tile_label = lv_label_create(cur_tile);
+        lv_obj_align(tile_label, LV_ALIGN_CENTER, 0, 0);
 
-      lv_app_2048_set_tile(cur_tile, tile_label, value);
+        lv_app_2048_set_tile(cur_tile, tile_label, value);
+      }
+      else
+      {
+        if (tile_obj[y][x])
+        {
+          lv_obj_delete(tile_obj[y][x]);
+          tile_obj[y][x] = NULL;
+        }
+      }
     }
   }
 }
@@ -320,12 +337,13 @@ static void lv_app_2048(lv_obj_t *scr)
   lv_app_2048_set_tile(title_tile, title_label, 2048);
 
   score_tile_w = ((w - tile_size - tile_size_m2) / 2) - margin;
-  lv_obj_t *score_tile = lv_obj_create(scr);
+  score_tile = lv_obj_create(scr);
   lv_obj_remove_flag(score_tile, LV_OBJ_FLAG_SCROLLABLE);
   lv_obj_set_style_bg_color(score_tile, lv_color_hex(BOARD_BG), LV_PART_MAIN);
   lv_obj_set_style_border_width(score_tile, 0, LV_PART_MAIN);
   lv_obj_set_size(score_tile, score_tile_w, tile_size);
   lv_obj_set_pos(score_tile, w - score_tile_w - margin - score_tile_w, 0);
+  lv_obj_add_event_cb(score_tile, lv_app_2048_record_score_tile_click, LV_EVENT_CLICKED, NULL);
 
   lv_obj_t *score_title_label = lv_label_create(score_tile);
   lv_label_set_text(score_title_label, "SCORE");
@@ -385,6 +403,10 @@ static void lv_app_2048(lv_obj_t *scr)
   lv_obj_add_event_cb(board, lv_app_2048_record_gesture, LV_EVENT_GESTURE, NULL);
   lv_obj_remove_flag(board, LV_OBJ_FLAG_GESTURE_BUBBLE);
 
+    // init vales
+  score_tile_clicked = false;
+  isPlaying = true;
+
 #ifdef DEBUG_MODE
   lv_app_2048_redraw_board_value();
 #else
@@ -395,15 +417,57 @@ static void lv_app_2048(lv_obj_t *scr)
 
 static bool lv_app_2048_loop()
 {
-  lv_app_2048_check_movable();
-  if (lv_app_2048_handle_gesture())
+  if (isPlaying)
   {
-    lv_app_2048_new_tile(1);
-    lv_app_2048_start_anim();
+    lv_app_2048_check_movable();
+    if (movable)
+    {
+      if (lv_app_2048_handle_gesture())
+      {
+        lv_app_2048_new_tile(1);
+        lv_app_2048_start_anim();
 #ifdef DEBUG_MODE
-    lv_app_2048_check_tile_val();
+        lv_app_2048_check_tile_val();
 #endif
-    return true;
+        return true;
+      }
+    }
+    else
+    {
+      Serial.println("not movable");
+      isPlaying = false;
+      lv_obj_set_style_bg_color(score_tile, lv_color_hex(TILE_64), LV_PART_MAIN);
+    }
   }
+  else /* !isPlaying */
+  {
+    if (score_tile_clicked)
+    {
+      // start a new game
+      lv_obj_set_style_bg_color(score_tile, lv_color_hex(BOARD_BG), LV_PART_MAIN);
+
+      // init value
+      for (int y = 0; y < 4; y++)
+      {
+        for (int x = 0; x < 4; x++)
+        {
+          tile_val[y][x] = 0;
+        }
+      }
+      curr_score = 0;
+
+      lv_app_2048_redraw_board_value();
+
+      // init vales
+      score_tile_clicked = false;
+      isPlaying = true;
+      lv_app_2048_anim_reset();
+
+      lv_app_2048_new_tile(2);
+      lv_app_2048_start_anim();
+      return true;
+    }
+  }
+
   return false;
 }

@@ -28,6 +28,14 @@ lv_anim_t growshrink_anim;
 AnimObjs popnew_objs;
 lv_anim_t popnew_anim;
 
+static void lv_app_2048_anim_reset()
+{
+  move_objs.anim_count = 0;
+  move_objs.tobe_merge_count = 0;
+  growshrink_objs.anim_count = 0;
+  popnew_objs.anim_count = 0;
+}
+
 static void lv_app_2048_anim_size_cb(void *var, int32_t v)
 {
   AnimObjs *objs = (AnimObjs *)var;
