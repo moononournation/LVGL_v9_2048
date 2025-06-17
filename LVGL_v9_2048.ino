@@ -2,9 +2,9 @@
 #include <lvgl.h>
 
 // Dev Device Pins: <https://github.com/moononournation/Dev_Device_Pins.git>
-#include "PINS_ESP32-S3-Touch-AMOLED-1_8.h"
+// #include "PINS_ESP32-S3-Touch-AMOLED-1_8.h"
 // #include "PINS_ESP32-S3-Touch-AMOLED-2_41.h"
-// #include "PINS_T4_S3.h"
+#include "PINS_T4_S3.h"
 
 #ifdef CANVAS_PREFERRED
 #define DIRECT_RENDER_MODE // full frame buffer
@@ -83,7 +83,7 @@ void setup()
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
   // while(!Serial);
-  Serial.println("LVGL App Demo");
+  Serial.println("LVGL V9 App 2048");
   String LVGL_Arduino = String('V') + lv_version_major() + "." + lv_version_minor() + "." + lv_version_patch();
   Serial.println(LVGL_Arduino);
 
@@ -92,7 +92,7 @@ void setup()
   {
     Serial.println("gfx->begin() failed!");
   }
-  gfx->setRotation(2);
+  // gfx->setRotation(2);
   gfx->fillScreen(RGB565_BLACK);
 
 #ifdef GFX_BL
@@ -102,6 +102,7 @@ void setup()
 
   // Init touch device
   touch_init(gfx->width(), gfx->height(), gfx->getRotation());
+
   lv_init();
 
   /*Set a tick source so that LVGL will know how much time elapsed. */
